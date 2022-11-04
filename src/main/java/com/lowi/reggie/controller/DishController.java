@@ -222,4 +222,17 @@ public class DishController {
         return R.success(dishDtoList);
     }
 
+    @PostMapping("/status/{status}")
+    public R<String> updateStatusByids(@PathVariable Integer status,@RequestParam List<Long> ids){
+        dishService.updateStatusByids(status,ids);
+        return R.success("停售成功");
+    }
+
+
+    @DeleteMapping
+    public R<String> deletedishbyids(@RequestParam("ids") List<Long> ids){
+        dishService.removeByIds(ids);
+        dishService.listByIds(ids);
+        return R.success("删除成功");
+    }
 }

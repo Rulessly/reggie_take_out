@@ -10,11 +10,14 @@ import com.lowi.reggie.mapper.SetmealMapper;
 import com.lowi.reggie.service.SetmealDishService;
 import com.lowi.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,5 +72,36 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper,Setmeal> imple
         lambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
         //删除关系表中的数据----setmeal_dish
         setmealDishService.remove(lambdaQueryWrapper);
+    }
+
+    @Override
+    public void updateSetmealStatusById(Integer status, List<Long> ids) {
+        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.in(ids!=null,Setmeal::getId,ids);
+        List<Setmeal> list=this.list(queryWrapper);
+
+        for (Setmeal setmeal : list) {
+            if (setmeal != null){
+                setmeal.setStatus(status);
+                this.updateById(setmeal);
+            }
+        }
+    }
+
+    @Override
+    public SetmealDto getDate(Long id) {
+        Setmeal setmeal = this.getById(id);
+        SetmealDto setmealDto = new SetmealDto();
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper();
+        //在关联表中查询，setmealdish
+        queryWrapper.eq(id!=null,SetmealDish::getSetmealId,id);
+
+        if (setmeal != null){
+            BeanUtils.copyProperties(setmeal,setmealDto);
+            List<SetmealDish> list = setmealDishService.list(queryWrapper);
+            setmealDto.setSetmealDishes(list);
+            return setmealDto;
+        }
+        return null;
     }
 }

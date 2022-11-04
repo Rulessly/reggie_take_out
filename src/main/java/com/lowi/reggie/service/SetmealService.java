@@ -18,4 +18,8 @@ public interface SetmealService extends IService<Setmeal> {
      * @param ids
      */
     public void removeWithDish(List<Long> ids);
+
+    void updateSetmealStatusById(Integer status,List<Long> ids);
+
+    SetmealDto getDate(Long id);
 }

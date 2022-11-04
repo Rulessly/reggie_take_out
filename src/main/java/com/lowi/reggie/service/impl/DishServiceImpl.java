@@ -90,4 +90,18 @@ public class DishServiceImpl extends ServiceImpl<DishMapper,Dish> implements Dis
 
         dishFlavorService.saveBatch(flavors);
     }
+
+    @Override
+    public void updateStatusByids(Integer status, List<Long> ids) {
+        LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.in(ids!=null,Dish::getId,ids);
+        List<Dish> list = this.list(queryWrapper);
+
+        for(Dish dish:list){
+            if(dish!=null){
+                dish.setStatus(status);
+                this.updateById(dish);
+            }
+        }
+    }
 }
